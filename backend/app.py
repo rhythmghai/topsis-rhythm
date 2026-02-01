@@ -1,0 +1,37 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os, re
+from topsis_rhythm_102303707.engine import run_topsis
+
+app = Flask(__name__)
+CORS(app)
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+EMAIL_REGEX = r'^[^@]+@[^@]+\.[^@]+$'
+
+@app.route("/topsis", methods=["POST"])
+def topsis_api():
+    if "file" not in request.files:
+        return jsonify({"error": "File missing"}), 400
+
+    weights = request.form.get("weights")
+    impacts = request.form.get("impacts")
+    email = request.form.get("email")
+
+    if not re.match(EMAIL_REGEX, email):
+        return jsonify({"error": "Invalid email format"}), 400
+
+    file = request.files["file"]
+    input_path = os.path.join(UPLOAD_DIR, file.filename)
+    output_path = os.path.join(UPLOAD_DIR, "result.csv")
+
+    file.save(input_path)
+
+    try:
+        run_topsis(input_path, weights, impacts, output_path)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    return jsonify({"message": "TOPSIS completed", "download": output_path})

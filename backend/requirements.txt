@@ -1,0 +1,6 @@
+flask
+flask-cors
+pandas
+numpy
+topsis-rhythm-102303707
+gunicorn
