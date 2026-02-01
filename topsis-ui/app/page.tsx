@@ -9,7 +9,7 @@ export default function Home() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const res = await fetch("https://YOUR-RENDER-URL.onrender.com/topsis", {
+    const res = await fetch("https://topsis-rhythm.onrender.com", {
       method: "POST",
       body: formData
     });
