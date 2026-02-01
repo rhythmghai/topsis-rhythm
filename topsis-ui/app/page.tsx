@@ -50,7 +50,10 @@ export default function Home() {
   );
 }
 
-const styles = {
+const styles: {
+  container: React.CSSProperties;
+  form: React.CSSProperties;
+} = {
   container: {
     width: "320px",
     margin: "120px auto",
