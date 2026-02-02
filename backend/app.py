@@ -16,6 +16,9 @@ EMAIL_USER = os.environ.get("EMAIL_USER")
 EMAIL_PASS = os.environ.get("EMAIL_PASS")
 
 def send_email(to_email, file_path):
+    if not EMAIL_USER or not EMAIL_PASS:
+        raise Exception("Email credentials not configured on server")
+
     msg = EmailMessage()
     msg["Subject"] = "Your TOPSIS Result"
     msg["From"] = EMAIL_USER
@@ -30,12 +33,14 @@ def send_email(to_email, file_path):
             filename="result.csv"
         )
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(EMAIL_USER, EMAIL_PASS)
-        server.send_message(msg)
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=15)
+    server.login(EMAIL_USER, EMAIL_PASS)
+    server.send_message(msg)
+    server.quit()
 
 @app.route("/topsis", methods=["POST"])
 def topsis_api():
+    print("TOPSIS endpoint hit")
     if "file" not in request.files:
         return jsonify({"error": "File missing"}), 400
 
@@ -53,8 +58,12 @@ def topsis_api():
     file.save(input_path)
 
     try:
+        print("Running TOPSIS...")
         run_topsis(input_path, weights, impacts, output_path)
+        print("Sending email...")
         send_email(email, output_path)
+        print("Email sent")
+
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 

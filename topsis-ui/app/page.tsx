@@ -39,7 +39,12 @@ export default function Home() {
           Smart multi-criteria ranking • Results delivered to your inbox
         </p>
 
-        <form onSubmit={submitForm} style={styles.form}>
+        <form
+         onSubmit={submitForm}
+         style={styles.form}
+         encType="multipart/form-data"
+        >
+
           <label style={styles.label}>Upload CSV</label>
           <input type="file" name="file" required style={styles.inputFile} />
 
@@ -222,3 +227,4 @@ const styles: {
     color: "#c7d2fe"
   }
 };
+
