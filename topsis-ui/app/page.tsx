@@ -6,16 +6,27 @@ export default function Home() {
   async function submitForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    alert("Uploading file and running TOPSIS... ⏳");
+
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const res = await fetch("https://topsis-rhythm.onrender.com", {
-      method: "POST",
-      body: formData
-    });
+    try {
+      const res = await fetch("https://topsis-rhythm.onrender.com/topsis", {
+        method: "POST",
+        body: formData
+      });
 
-    const data = await res.json();
-    alert(data.message || "Something went wrong. Please try again.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert("Server error: " + data.error);
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert("Network error: Backend not reachable");
+    }
   }
 
   return (
@@ -68,6 +79,31 @@ export default function Home() {
           Built by Rhythm • Cloud-powered decision engine
         </p>
       </div>
+
+      {/* Micro-interactions */}
+      <style jsx global>{`
+        button:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 15px 40px rgba(99, 102, 241, 0.8);
+        }
+
+        input:focus {
+          border-color: #818cf8;
+          box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.4);
+        }
+
+        @keyframes float {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-6px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -186,26 +222,3 @@ const styles: {
     color: "#c7d2fe"
   }
 };
-
-
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.innerHTML = `
-    button:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 15px 40px rgba(99,102,241,0.8);
-    }
-
-    input:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 2px rgba(129,140,248,0.4);
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
-      100% { transform: translateY(0px); }
-    }
-  `;
-  document.head.appendChild(style);
-}
